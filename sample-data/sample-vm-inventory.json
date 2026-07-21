@@ -1,0 +1,252 @@
+{
+  "GeneratedUtc": "2026-07-20T14:32:00Z",
+  "SubscriptionId": "00000000-0000-0000-0000-000000000000",
+  "SubscriptionName": "contoso-nonprod-sim",
+  "Note": "Simulated Az-shaped VM inventory for -SimulationMode. Shapes mirror Get-AzVM / Get-AzNetworkInterface / Get-AzNetworkSecurityGroup / Get-AzVMExtension output flattened into a single object per VM for offline demo purposes.",
+  "VirtualMachines": [
+    {
+      "Name": "vm-web01-prod",
+      "ResourceGroupName": "rg-contoso-prod-web",
+      "Location": "eastus2",
+      "VmId": "1a2b3c4d-0001-4a11-9c1a-0000000000a1",
+      "VmSize": "Standard_D2s_v5",
+      "ProvisioningState": "Succeeded",
+      "PowerState": "VM running",
+      "Tags": {
+        "Environment": "Production",
+        "Owner": "web-platform-team",
+        "CostCenter": "CC-1001",
+        "Application": "corp-website",
+        "BackupPolicy": "gold-daily-30d",
+        "MonitoringEnabled": "true"
+      },
+      "Identity": {
+        "Type": "SystemAssigned",
+        "PrincipalId": "8f3a1c22-44bb-4e11-9a10-11111111a1a1"
+      },
+      "NetworkProfile": {
+        "NetworkInterfaces": [
+          {
+            "Name": "nic-web01-prod",
+            "PrimaryPrivateIpAddress": "10.20.1.4",
+            "NetworkSecurityGroup": {
+              "Id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-contoso-prod-web/providers/Microsoft.Network/networkSecurityGroups/nsg-web01-prod",
+              "Name": "nsg-web01-prod"
+            },
+            "Subnet": {
+              "Id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-contoso-prod-web/providers/Microsoft.Network/virtualNetworks/vnet-prod-web/subnets/snet-web",
+              "NetworkSecurityGroup": null
+            }
+          }
+        ]
+      },
+      "StorageProfile": {
+        "OsDisk": {
+          "Name": "vm-web01-prod_OsDisk_1",
+          "Sku": "Premium_LRS",
+          "EncryptionAtHost": true,
+          "EncryptionType": "EncryptionAtRestWithPlatformKey"
+        }
+      },
+      "Extensions": [
+        { "Name": "AzureMonitorWindowsAgent", "Publisher": "Microsoft.Azure.Monitor", "ProvisioningState": "Succeeded" },
+        { "Name": "MicrosoftMonitoringAgent", "Publisher": "Microsoft.EnterpriseCloud.Monitoring", "ProvisioningState": "Succeeded" }
+      ],
+      "BackupRegistered": true,
+      "BackupVaultName": "rsv-contoso-prod-eastus2",
+      "OsType": "Windows"
+    },
+    {
+      "Name": "vm-app02-prod",
+      "ResourceGroupName": "rg-contoso-prod-app",
+      "Location": "eastus2",
+      "VmId": "1a2b3c4d-0002-4a11-9c1a-0000000000a2",
+      "VmSize": "Standard_D4s_v5",
+      "ProvisioningState": "Succeeded",
+      "PowerState": "VM running",
+      "Tags": {
+        "Environment": "Production",
+        "Owner": "app-platform-team",
+        "CostCenter": "CC-1002",
+        "Application": "order-service"
+      },
+      "Identity": {
+        "Type": "None",
+        "PrincipalId": null
+      },
+      "NetworkProfile": {
+        "NetworkInterfaces": [
+          {
+            "Name": "nic-app02-prod",
+            "PrimaryPrivateIpAddress": "10.20.2.5",
+            "NetworkSecurityGroup": null,
+            "Subnet": {
+              "Id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-contoso-prod-app/providers/Microsoft.Network/virtualNetworks/vnet-prod-app/subnets/snet-app",
+              "NetworkSecurityGroup": null
+            }
+          }
+        ]
+      },
+      "StorageProfile": {
+        "OsDisk": {
+          "Name": "vm-app02-prod_OsDisk_1",
+          "Sku": "Standard_LRS",
+          "EncryptionAtHost": false,
+          "EncryptionType": "EncryptionAtRestWithPlatformKey"
+        }
+      },
+      "Extensions": [],
+      "BackupRegistered": false,
+      "BackupVaultName": null,
+      "OsType": "Linux",
+      "IntentionalFailureNote": "No NSG on NIC or subnet (High severity NSG rule fails); no managed identity (High severity Identity rule fails); no BackupPolicy tag and not vault-registered (High severity Backup rule fails); missing CostCenter... actually present, missing MonitoringEnabled tag/extension (Medium Monitoring rule fails); Standard_LRS + no host encryption (Medium Disk rule fails). This VM demonstrates the non-zero exit code path."
+    },
+    {
+      "Name": "vm-db03-prod",
+      "ResourceGroupName": "rg-contoso-prod-data",
+      "Location": "centralus",
+      "VmId": "1a2b3c4d-0003-4a11-9c1a-0000000000a3",
+      "VmSize": "Standard_E4s_v5",
+      "ProvisioningState": "Succeeded",
+      "PowerState": "VM running",
+      "Tags": {
+        "Environment": "Production",
+        "Owner": "data-platform-team",
+        "CostCenter": "CC-1003",
+        "Application": "orders-sqldb"
+      },
+      "Identity": {
+        "Type": "UserAssigned",
+        "PrincipalId": "8f3a1c22-44bb-4e11-9a10-33333333c3c3"
+      },
+      "NetworkProfile": {
+        "NetworkInterfaces": [
+          {
+            "Name": "nic-db03-prod",
+            "PrimaryPrivateIpAddress": "10.20.3.6",
+            "NetworkSecurityGroup": {
+              "Id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-contoso-prod-data/providers/Microsoft.Network/networkSecurityGroups/nsg-db03-prod",
+              "Name": "nsg-db03-prod"
+            },
+            "Subnet": {
+              "Id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-contoso-prod-data/providers/Microsoft.Network/virtualNetworks/vnet-prod-data/subnets/snet-data",
+              "NetworkSecurityGroup": null
+            }
+          }
+        ]
+      },
+      "StorageProfile": {
+        "OsDisk": {
+          "Name": "vm-db03-prod_OsDisk_1",
+          "Sku": "Premium_LRS",
+          "EncryptionAtHost": true,
+          "EncryptionType": "EncryptionAtRestWithPlatformKey"
+        }
+      },
+      "Extensions": [
+        { "Name": "AzureMonitorLinuxAgent", "Publisher": "Microsoft.Azure.Monitor", "ProvisioningState": "Succeeded" }
+      ],
+      "BackupRegistered": true,
+      "BackupVaultName": "rsv-contoso-prod-centralus",
+      "OsType": "Linux"
+    },
+    {
+      "Name": "vm-batch04-nonprod",
+      "ResourceGroupName": "rg-contoso-dev-batch",
+      "Location": "eastus2",
+      "VmId": "1a2b3c4d-0004-4a11-9c1a-0000000000a4",
+      "VmSize": "Standard_B2s",
+      "ProvisioningState": "Succeeded",
+      "PowerState": "VM running",
+      "Tags": {
+        "Environment": "Development",
+        "Owner": "batch-jobs-team",
+        "Application": "nightly-etl"
+      },
+      "Identity": {
+        "Type": "SystemAssigned",
+        "PrincipalId": "8f3a1c22-44bb-4e11-9a10-44444444d4d4"
+      },
+      "NetworkProfile": {
+        "NetworkInterfaces": [
+          {
+            "Name": "nic-batch04-nonprod",
+            "PrimaryPrivateIpAddress": "10.30.1.7",
+            "NetworkSecurityGroup": null,
+            "Subnet": {
+              "Id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-contoso-dev-batch/providers/Microsoft.Network/virtualNetworks/vnet-dev/subnets/snet-batch",
+              "NetworkSecurityGroup": {
+                "Id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-contoso-dev-batch/providers/Microsoft.Network/networkSecurityGroups/nsg-dev-batch-subnet",
+                "Name": "nsg-dev-batch-subnet"
+              }
+            }
+          }
+        ]
+      },
+      "StorageProfile": {
+        "OsDisk": {
+          "Name": "vm-batch04-nonprod_OsDisk_1",
+          "Sku": "StandardSSD_LRS",
+          "EncryptionAtHost": false,
+          "EncryptionType": "EncryptionAtRestWithPlatformKey"
+        }
+      },
+      "Extensions": [],
+      "BackupRegistered": false,
+      "BackupVaultName": null,
+      "OsType": "Linux",
+      "IntentionalFailureNote": "Missing CostCenter tag (Medium tagging rule fails); NSG associated at subnet level rather than NIC (should still Pass NSG rule); no BackupPolicy tag and not vault-registered (High severity Backup rule fails, tag-based intent note applies); no MonitoringEnabled tag/extension (Medium fails); EncryptionAtHost false but SKU is in allowed list so Disk rule fails only on encryption sub-check (Medium)."
+    },
+    {
+      "Name": "vm-jump05-mgmt",
+      "ResourceGroupName": "rg-contoso-mgmt",
+      "Location": "eastus2",
+      "VmId": "1a2b3c4d-0005-4a11-9c1a-0000000000a5",
+      "VmSize": "Standard_B1s",
+      "ProvisioningState": "Succeeded",
+      "PowerState": "VM running",
+      "Tags": {
+        "Environment": "Production",
+        "Owner": "identity-and-access-team",
+        "CostCenter": "CC-1005",
+        "Application": "jumpbox",
+        "BackupPolicy": "silver-weekly-14d",
+        "MonitoringEnabled": "true"
+      },
+      "Identity": {
+        "Type": "SystemAssigned",
+        "PrincipalId": "8f3a1c22-44bb-4e11-9a10-55555555e5e5"
+      },
+      "NetworkProfile": {
+        "NetworkInterfaces": [
+          {
+            "Name": "nic-jump05-mgmt",
+            "PrimaryPrivateIpAddress": "10.40.1.8",
+            "NetworkSecurityGroup": {
+              "Id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-contoso-mgmt/providers/Microsoft.Network/networkSecurityGroups/nsg-jump05-mgmt",
+              "Name": "nsg-jump05-mgmt"
+            },
+            "Subnet": {
+              "Id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-contoso-mgmt/providers/Microsoft.Network/virtualNetworks/vnet-mgmt/subnets/snet-mgmt",
+              "NetworkSecurityGroup": null
+            }
+          }
+        ]
+      },
+      "StorageProfile": {
+        "OsDisk": {
+          "Name": "vm-jump05-mgmt_OsDisk_1",
+          "Sku": "Premium_LRS",
+          "EncryptionAtHost": true,
+          "EncryptionType": "EncryptionAtRestWithPlatformKey"
+        }
+      },
+      "Extensions": [
+        { "Name": "AzureMonitorWindowsAgent", "Publisher": "Microsoft.Azure.Monitor", "ProvisioningState": "Succeeded" }
+      ],
+      "BackupRegistered": true,
+      "BackupVaultName": "rsv-contoso-prod-eastus2",
+      "OsType": "Windows"
+    }
+  ]
+}

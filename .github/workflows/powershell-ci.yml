@@ -1,0 +1,107 @@
+name: PowerShell CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  analyze-test-and-smoke:
+    name: Analyze, Test, and Smoke-Test (Simulation Mode)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install PSScriptAnalyzer and Pester
+        shell: pwsh
+        run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Install-Module -Name PSScriptAnalyzer -MinimumVersion 1.21.0 -Scope CurrentUser -Force
+          Install-Module -Name Pester -MinimumVersion 5.5.0 -Scope CurrentUser -Force -SkipPublisherCheck
+
+      - name: Run PSScriptAnalyzer (fail on Error severity)
+        shell: pwsh
+        run: |
+          $results = Invoke-ScriptAnalyzer -Path . -Recurse -Severity Error -ExcludeRule PSAvoidUsingWriteHost
+          if ($results) {
+            $results | Format-Table -AutoSize | Out-String | Write-Host
+            Write-Error "PSScriptAnalyzer found $($results.Count) Error-severity issue(s). Failing build."
+            exit 1
+          }
+          else {
+            Write-Host "PSScriptAnalyzer: no Error-severity issues found." -ForegroundColor Green
+          }
+
+      - name: Run Pester tests (NUnit XML output)
+        shell: pwsh
+        run: |
+          $config = New-PesterConfiguration
+          $config.Run.Path = './tests'
+          $config.Run.Exit = $true
+          $config.Output.Verbosity = 'Detailed'
+          $config.TestResult.Enabled = $true
+          $config.TestResult.OutputFormat = 'NUnitXml'
+          $config.TestResult.OutputPath = './test-results/pester-results.xml'
+          New-Item -Path './test-results' -ItemType Directory -Force | Out-Null
+          Invoke-Pester -Configuration $config
+
+      - name: Upload Pester test results artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pester-test-results
+          path: test-results/pester-results.xml
+          if-no-files-found: warn
+
+      - name: Smoke test — audit-vm-baseline.ps1 -SimulationMode (no Azure credentials required)
+        shell: pwsh
+        run: |
+          # This step intentionally treats the script's known exit codes (0 = fully
+          # compliant, 1 = at least one High-severity finding) as a SUCCESSFUL smoke
+          # test, since the shipped sample data deliberately contains a High-severity
+          # finding to demonstrate CI/ops gating. Only an unhandled exception (exit
+          # code 2, or a thrown terminating error from a missing/broken script) fails
+          # this step.
+          $ErrorActionPreference = 'Stop'
+          try {
+            & ./scripts/audit-vm-baseline.ps1 -SimulationMode $true -OutputPath './ci-smoke-output' -Format Both
+            $exitCode = $LASTEXITCODE
+          }
+          catch {
+            Write-Error "audit-vm-baseline.ps1 threw an unhandled exception during the simulation smoke test: $($_.Exception.Message)"
+            exit 1
+          }
+
+          Write-Host "audit-vm-baseline.ps1 -SimulationMode exited with code $exitCode" -ForegroundColor Cyan
+
+          if ($exitCode -eq 0 -or $exitCode -eq 1) {
+            Write-Host "Smoke test passed: script ran to completion without throwing (exit code $exitCode is an expected outcome, not a crash)." -ForegroundColor Green
+          }
+          else {
+            Write-Error "Smoke test failed: audit-vm-baseline.ps1 exited with unexpected code $exitCode (expected 0 or 1)."
+            exit 1
+          }
+
+          if (-not (Test-Path './ci-smoke-output/sample-compliance-report.md')) {
+            Write-Error 'Smoke test failed: expected report file sample-compliance-report.md was not created.'
+            exit 1
+          }
+          if (-not (Test-Path './ci-smoke-output/sample-compliance-report.csv')) {
+            Write-Error 'Smoke test failed: expected report file sample-compliance-report.csv was not created.'
+            exit 1
+          }
+
+      - name: Upload simulation smoke-test report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: simulation-smoke-test-report
+          path: ci-smoke-output/
+          if-no-files-found: warn

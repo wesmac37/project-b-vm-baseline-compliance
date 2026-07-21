@@ -1,0 +1,28 @@
+# Logs produced by live-mode audit runs
+/logs/
+*.log
+
+# CI / local test output
+/test-results/
+/ci-smoke-output/
+*.trx
+TestResults/
+
+# PowerShell module analysis cache
+*.psd1.bak
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# Azure credential/context leftovers — never commit these
+*.azureauth
+AzureRmContext.json
+AzureRmContext.json.bak
+
+# Local environment/secret overrides
+.env
+*.local.psd1
