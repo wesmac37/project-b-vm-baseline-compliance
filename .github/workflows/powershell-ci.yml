@@ -98,6 +98,12 @@ jobs:
             exit 1
           }
 
+          # audit-vm-baseline.ps1's own exit code (0 or 1) is meaningful audit output, not a
+          # smoke-test failure signal. Explicitly clear it here so this CI step's own exit
+          # code reflects only whether the smoke test itself passed (it did, or we'd have
+          # exited 1 above already).
+          exit 0
+
       - name: Upload simulation smoke-test report artifact
         if: always()
         uses: actions/upload-artifact@v4
